@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Payment.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://techsolutionback.onrender.com/api';
+
 const Payment = ({ 
   amount, 
   customer = {
@@ -23,7 +25,7 @@ const Payment = ({
       setSuccess(false);
       
       // Create order on backend
-      const { data } = await axios.post('http://localhost:5000/api/payment/create-order', {
+      const { data } = await axios.post(`${API_BASE_URL}/payment/create-order`, {
         amount,
         currency: 'INR',
         customer
@@ -44,7 +46,7 @@ const Payment = ({
         handler: async (response) => {
           try {
             // Verify payment on backend
-            const verifyData = await axios.post('http://localhost:5000/api/payment/verify', {
+            const verifyData = await axios.post(`${API_BASE_URL}/payment/verify`, {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature

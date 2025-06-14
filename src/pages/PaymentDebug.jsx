@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { initiatePayment, demoPayment } from '../services/payment';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://techsolutionback.onrender.com/api';
+
 const PaymentDebug = () => {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState(2999);
@@ -37,7 +39,7 @@ const PaymentDebug = () => {
     addLog('Testing create order API...', 'info');
     
     try {
-      const response = await fetch('http://localhost:5000/api/payment/create-order', {
+      const response = await fetch(`${API_BASE_URL}/payment/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
