@@ -120,11 +120,8 @@ const ProjectDetail = () => {
 
     setPaymentLoading(true);
 
-    // Convert USD to INR for demo (1 USD = 83 INR approximately)
-    const amountInINR = Math.round(project.price * 83);
-
     const paymentData = {
-      amount: amountInINR,
+      amount: project.price,
       currency: 'INR',
       name: 'Your Company - Premium Projects',
       description: `${project.title} - Complete Source Code & Documentation`,
@@ -145,7 +142,7 @@ const ProjectDetail = () => {
 🎉 Payment Successful!
 
 Project: ${project.title}
-Amount Paid: ₹${amountInINR.toLocaleString('en-IN')}
+Amount Paid: ₹${project.price.toLocaleString('en-IN')}
 Payment ID: ${response.razorpay_payment_id}
 Order ID: ${response.razorpay_order_id}
 
@@ -159,13 +156,6 @@ Thank you for your purchase!
         `;
 
         alert(successMessage);
-
-        // Here you can:
-        // 1. Send confirmation email
-        // 2. Update user's purchased projects
-        // 3. Redirect to download page
-        // 4. Show success modal
-
         console.log('Payment successful:', response);
       },
       onError: (error) => {
@@ -238,8 +228,8 @@ Thank you for your purchase!
               </div>
 
               <div className="project-pricing-hero">
-                <span className="original-price">${project.originalPrice}</span>
-                <span className="current-price">${project.price}</span>
+                <span className="original-price">₹{project.originalPrice}</span>
+                <span className="current-price">₹{project.price}</span>
                 <span className="discount">
                   {Math.round(((project.originalPrice - project.price) / project.originalPrice) * 100)}% OFF
                 </span>
@@ -251,7 +241,7 @@ Thank you for your purchase!
                   onClick={handlePurchase}
                   disabled={paymentLoading}
                 >
-                  {paymentLoading ? 'Processing...' : `Buy Now - ${formatCurrency(project.price)} (₹${Math.round(project.price * 83).toLocaleString('en-IN')})`}
+                  {paymentLoading ? 'Processing...' : `Buy Now - ₹${project.price}`}
                 </button>
                 <button
                   className="btn btn-outline btn-large"

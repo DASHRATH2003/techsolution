@@ -17,8 +17,8 @@ const Services = () => {
       description: "Complete online store with payment gateway, inventory management, and admin dashboard",
       shortDescription: "Full-featured e-commerce solution with modern design",
       category: "web-development",
-      price: 2999,
-      originalPrice: 3999,
+      price: 1,
+      originalPrice: 150,
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       features: ["Responsive Design", "Payment Gateway", "Admin Panel", "Inventory Management", "SEO Optimized"],
       technologies: ["React", "Node.js", "MongoDB", "Stripe"],
@@ -31,8 +31,8 @@ const Services = () => {
       description: "Complete restaurant management with POS, inventory, staff management, and customer ordering",
       shortDescription: "Comprehensive restaurant management solution",
       category: "web-development",
-      price: 2499,
-      originalPrice: 3299,
+      price: 100,
+      originalPrice: 150,
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       features: ["POS System", "Table Management", "Online Ordering", "Staff Management", "Analytics"],
       technologies: ["React", "Express", "PostgreSQL", "Socket.io"],
@@ -45,10 +45,10 @@ const Services = () => {
       description: "Educational platform with course management, video streaming, assignments, and progress tracking",
       shortDescription: "Complete LMS for educational institutions",
       category: "web-development",
-      price: 3499,
-      originalPrice: 4499,
+      price: 100,
+      originalPrice: 150,
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      features: ["Course Management", "Video Streaming", "Assignments", "Progress Tracking", "Certificates"],
+      features: ["Course Management", "Video Streaming", "Assignments", "Progress Tracking", "Analytics"],
       technologies: ["React", "Node.js", "MongoDB", "AWS S3"],
       deliveryTime: "20-25 days",
       image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=500&h=300&fit=crop"
@@ -173,10 +173,7 @@ const Services = () => {
   ];
 
   const handlePurchase = async (project) => {
-    // Convert USD to INR for demo (1 USD = 83 INR approximately)
-    const amountInINR = Math.round(project.price * 83);
-
-    console.log('Starting purchase for project:', project.title, 'Amount:', amountInINR);
+    console.log('Starting purchase for project:', project.title, 'Amount:', project.price);
 
     // First, test backend connectivity
     try {
@@ -195,7 +192,7 @@ const Services = () => {
     }
 
     const paymentData = {
-      amount: amountInINR,
+      amount: project.price,
       currency: 'INR',
       name: 'Your Company - Premium Projects',
       description: `${project.title} - Complete Source Code & Documentation`,
@@ -213,25 +210,28 @@ const Services = () => {
 🎉 Payment Successful!
 
 Project: ${project.title}
-Amount Paid: ₹${amountInINR.toLocaleString('en-IN')}
+Amount Paid: ₹${project.price.toLocaleString('en-IN')}
 Payment ID: ${response.razorpay_payment_id}
 
 ✅ What happens next:
 • You'll receive project files via email within 24 hours
 • Complete source code with documentation
 • 30 days of free support included
+• Installation guide and setup instructions
 
 Thank you for your purchase!
         `;
+
         alert(successMessage);
         console.log('Payment successful:', response);
       },
       onError: (error) => {
         console.error('Payment error:', error);
+
         if (error.message.includes('cancelled')) {
           alert('Payment was cancelled. You can try again anytime.');
         } else {
-          alert('Payment failed. Please try again or contact support.');
+          alert('Payment failed. Please try again or contact support if the issue persists.');
         }
       }
     };
@@ -325,8 +325,8 @@ Thank you for your purchase!
 
                   <div className="project-footer">
                     <div className="project-pricing">
-                      <span className="original-price">${project.originalPrice}</span>
-                      <span className="current-price">${project.price}</span>
+                      <span className="original-price">₹{project.originalPrice}</span>
+                      <span className="current-price">₹{project.price}</span>
                       <span className="discount">
                         {Math.round(((project.originalPrice - project.price) / project.originalPrice) * 100)}% OFF
                       </span>

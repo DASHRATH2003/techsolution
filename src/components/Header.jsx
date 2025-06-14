@@ -39,7 +39,7 @@ const Header = () => {
         <div className="header-content">
           <div className="logo">
             <Link to="/" onClick={closeMenu}>
-              <h2>{companyInfo?.name || ''}</h2>
+              <h2>{companyInfo?.name || ''} </h2>
             </Link>
           </div>
 

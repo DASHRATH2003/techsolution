@@ -74,13 +74,13 @@ export const initiatePayment = async (paymentData) => {
     console.log('Order created successfully:', orderData);
 
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag', // Demo Razorpay key - replace with your actual key
-      amount: amount * 100, // Amount in paise (multiply by 100 for INR)
+      key: 'rzp_test_QV9SfOLROu5Gli', // Using the same key as backend
+      amount: orderData.order.amount, // Use amount from order response
       currency,
       name,
       description,
       image,
-      order_id: orderData.order.id, // Use order ID from backend
+      order_id: orderData.order.id,
       handler: function (response) {
         console.log('Payment Success:', response);
         // Verify payment on backend
@@ -107,40 +107,14 @@ export const initiatePayment = async (paymentData) => {
       theme: {
         color: theme.color || '#667eea'
       },
-      method: {
-        netbanking: true,
-        card: true,
-        upi: true,
-        wallet: true,
-        emi: true,
-        paylater: true
-      },
       modal: {
         ondismiss: function() {
           console.log('Payment modal closed');
           onError && onError(new Error('Payment cancelled by user'));
         },
-        // Escape key handling
         escape: true,
-        // Animation settings
         animation: true,
-        // Confirm close
         confirm_close: true
-      },
-      // Retry settings
-      retry: {
-        enabled: true,
-        max_count: 3
-      },
-      // Timeout settings
-      timeout: 300, // 5 minutes
-      // Remember customer
-      remember_customer: true,
-      // Readonly contact
-      readonly: {
-        email: false,
-        contact: false,
-        name: false
       }
     };
 
