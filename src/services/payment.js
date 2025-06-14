@@ -1,4 +1,6 @@
 // Payment service for Razorpay integration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://techsolutionback.onrender.com/api';
+const COMPANY_NAME = 'TechSolution';
 
 export const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -30,7 +32,7 @@ export const initiatePayment = async (paymentData) => {
   const {
     amount,
     currency = 'INR',
-    name = 'Your Company',
+    name = COMPANY_NAME,
     description,
     image = '/logo.png',
     prefill = {},
@@ -50,7 +52,7 @@ export const initiatePayment = async (paymentData) => {
     // Create order on backend
     console.log('Creating order with amount:', amount, 'currency:', currency);
 
-    const orderResponse = await fetch('http://localhost:5000/api/payment/create-order', {
+    const orderResponse = await fetch(`${API_BASE_URL}/payment/create-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,12 +76,12 @@ export const initiatePayment = async (paymentData) => {
     console.log('Order created successfully:', orderData);
 
     const options = {
-      key: 'rzp_test_QV9SfOLROu5Gli', // Using the same key as backend
-      amount: orderData.order.amount, // Use amount from order response
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_QV9SfOLROu5Gli',
+      amount: orderData.order.amount,
       currency,
-      name,
-      description,
-      image,
+      name: COMPANY_NAME,
+      description: description || 'Payment for TechSolution services',
+      image: 'https://techsolution-gamma.vercel.app/logo.png',
       order_id: orderData.order.id,
       handler: function (response) {
         console.log('Payment Success:', response);
@@ -96,39 +98,11 @@ export const initiatePayment = async (paymentData) => {
             onError && onError(error);
           });
       },
-      prefill: {
-        name: prefill.name || 'Customer Name',
-        email: prefill.email || 'customer@example.com',
-        contact: prefill.contact || '9999999999'
-      },
-      notes: {
-        address: 'Corporate Office'
-      },
-      theme: {
-        color: theme.color || '#667eea'
-      },
-      modal: {
-        ondismiss: function() {
-          console.log('Payment modal closed');
-          onError && onError(new Error('Payment cancelled by user'));
-        },
-        escape: true,
-        animation: true,
-        confirm_close: true
-      }
+      prefill,
+      theme
     };
 
-    console.log('Initiating Razorpay payment with options:', options);
-
     const rzp = new window.Razorpay(options);
-
-    // Handle payment failure
-    rzp.on('payment.failed', function (response) {
-      console.log('Payment Failed:', response.error);
-      onError && onError(new Error(`Payment failed: ${response.error.description}`));
-    });
-
-    // Open the payment modal
     rzp.open();
 
   } catch (error) {
@@ -139,7 +113,7 @@ export const initiatePayment = async (paymentData) => {
 
 const verifyPayment = async (paymentResponse) => {
   try {
-    const response = await fetch('http://localhost:5000/api/payment/verify', {
+    const response = await fetch(`${API_BASE_URL}/payment/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +141,7 @@ export const demoPayment = async (paymentData) => {
   const {
     amount,
     currency = 'INR',
-    name = 'Your Company',
+    name = COMPANY_NAME,
     description,
     onSuccess,
     onError

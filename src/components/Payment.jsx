@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Payment.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://techsolutionback.onrender.com/api';
+const COMPANY_NAME = 'TechSolution';
 
 const Payment = ({ 
   amount, 
@@ -40,8 +41,8 @@ const Payment = ({
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: data.order.amount,
         currency: data.order.currency,
-        name: 'Your Company Name',
-        description: 'Payment for your service',
+        name: COMPANY_NAME,
+        description: 'Payment for services',
         order_id: data.order.id,
         handler: async (response) => {
           try {

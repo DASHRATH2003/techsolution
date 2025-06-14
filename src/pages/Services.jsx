@@ -194,11 +194,11 @@ const Services = () => {
     const paymentData = {
       amount: project.price,
       currency: 'INR',
-      name: 'Your Company - Premium Projects',
+      name: 'TechSolution - Premium Projects',
       description: `${project.title} - Complete Source Code & Documentation`,
-      image: 'https://cdn.razorpay.com/logos/7K3b6d18wHwKzL_medium.png',
+      image: 'https://techsolution-gamma.vercel.app/logo.png',
       prefill: {
-        name: 'John Doe',
+        name: 'Customer Name',
         email: 'customer@example.com',
         contact: '9999999999'
       },
@@ -219,7 +219,7 @@ Payment ID: ${response.razorpay_payment_id}
 • 30 days of free support included
 • Installation guide and setup instructions
 
-Thank you for your purchase!
+Thank you for choosing TechSolution!
         `;
 
         alert(successMessage);
