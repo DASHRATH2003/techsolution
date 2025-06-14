@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { companyAPI } from '../services/api';
+import logo from '../assets/logo.png';
 import './Header.css';
 
 const Header = () => {
@@ -39,7 +39,7 @@ const Header = () => {
         <div className="header-content">
           <div className="logo">
             <Link to="/" onClick={closeMenu}>
-              <h2>{companyInfo?.name || 'distech.com'} </h2>
+              <img src={logo} alt="Codetech Logo" className="logo-image" />
             </Link>
           </div>
 
@@ -63,7 +63,7 @@ const Header = () => {
                   About
                 </Link>
               </li>
-              <li className="nav-item dropdown">
+              <li className="nav-item">
                 <Link 
                   to="/services" 
                   className={`nav-link ${isActive('/services')}`}
@@ -99,26 +99,15 @@ const Header = () => {
                   Careers
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link 
-                  to="/contact" 
-                  className={`nav-link ${isActive('/contact')} cta-button`}
-                  onClick={closeMenu}
-                >
-                  Contact Us
-                </Link>
-              </li>
             </ul>
           </nav>
 
-          <button 
-            className="menu-toggle"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+          <Link to="/contact" className="contact-button">
+            Contact Us
+          </Link>
+
+          <button className="menu-toggle" onClick={toggleMenu}>
+            <span className="menu-icon"></span>
           </button>
         </div>
       </div>

@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { companyAPI, teamAPI } from '../services/api';
+import { companyAPI } from '../services/api';
+import { Link } from 'react-router-dom';
+import welcomeImage from '../assets/welcome.jpg';
+import businessProcessImage from '../assets/businessprocess.png';
 import './About.css';
 
 const About = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
-  const [leadership, setLeadership] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState({});
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef(null);
   const observerRef = useRef(null);
 
   useEffect(() => {
     fetchAboutData();
     setupIntersectionObserver();
-    setupMouseTracking();
 
     return () => {
       if (observerRef.current) {
@@ -39,18 +39,6 @@ const About = () => {
     );
   };
 
-  const setupMouseTracking = () => {
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  };
-
   useEffect(() => {
     const sections = document.querySelectorAll('[data-section]');
     sections.forEach(section => {
@@ -63,13 +51,8 @@ const About = () => {
   const fetchAboutData = async () => {
     try {
       setLoading(true);
-      const [companyResponse, leadershipResponse] = await Promise.all([
-        companyAPI.getCompanyInfo(),
-        teamAPI.getLeadership()
-      ]);
-
+      const companyResponse = await companyAPI.getCompanyInfo();
       setCompanyInfo(companyResponse.data);
-      setLeadership(leadershipResponse.data);
     } catch (error) {
       console.error('Error fetching about data:', error);
     } finally {
@@ -83,87 +66,88 @@ const About = () => {
 
   return (
     <div className="about">
-      {/* Animated Background Particles */}
-      <div className="particles-container">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`,
-              animationDuration: `${15 + Math.random() * 10}s`
-            }}
-          />
-        ))}
-      </div>
-
       {/* Hero Section */}
-      <section className="about-hero" ref={heroRef}>
-        <div className="hero-background">
-          <div
-            className="hero-gradient"
-            style={{
-              transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`
-            }}
-          />
-        </div>
-        <div className="container">
-          <div className="hero-content animate-fade-up">
-            <h1>About {companyInfo?.name || 'Our Company'}</h1>
-            <p className="hero-subtitle">{companyInfo?.tagline || 'Building the future, one project at a time'}</p>
-          </div>
-        </div>
-      </section>
+      <section className="about-hero-section" ref={heroRef}>
+        <div className="about-container">
+          <div className="about-content">
+            <div className="about-text">
+              <h1 className="about-title">
+                Grow your Business<br />
+                &<br />
+                Customer<br />
+                Satisfaction<br />
+                with <span className="highlight">TechSolutions Inc.</span>
+              </h1>
+              
+              <p className="about-description">
+                Dynamically disintermediate technically sound technologies with compelling quality vectors error-free communities.
+              </p>
 
-      {/* Company Story */}
-      <section className="company-story" data-section="story">
-        <div className="container">
-          <div className={`story-content ${isVisible.story ? 'animate-slide-up' : ''}`}>
-            <div className="story-text">
-              <h2>Our Story</h2>
-              <p>{companyInfo?.story || 'We started with a simple mission: to help businesses succeed through innovative solutions and exceptional service.'}</p>
+              <div className="about-cta-buttons">
+                <Link to="/careers" className="btn btn-primary">
+                  Open Positions
+                </Link>
+                <Link to="/team" className="btn btn-secondary">
+                  Meet Our Team
+                </Link>
+              </div>
             </div>
-            <div className="story-timeline">
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="timeline-content">
-                  <h3>2018</h3>
-                  <p>Company Founded</p>
-                </div>
-              </div>
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="timeline-content">
-                  <h3>2020</h3>
-                  <p>Expanded Services</p>
-                </div>
-              </div>
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="timeline-content">
-                  <h3>2023</h3>
-                  <p>Global Reach</p>
-                </div>
+
+            <div className="about-image">
+              <img 
+                src={welcomeImage}
+                alt="Team brainstorming session" 
+                className="main-image"
+              />
+              <div className="floating-shapes">
+                <div className="shape shape-1"></div>
+                <div className="shape shape-2"></div>
+                <div className="shape shape-3"></div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Background Elements */}
+        <div className="background-elements">
+          <div className="gradient-circle gradient-1"></div>
+          <div className="gradient-circle gradient-2"></div>
+          <div className="gradient-circle gradient-3"></div>
+        </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="mission-vision" data-section="mv">
+      {/* About Description Section */}
+      <section className="about-description-section" data-section="description">
         <div className="container">
-          <div className={`mv-grid ${isVisible.mv ? 'animate-slide-up' : ''}`}>
-            <div className="mv-card">
-              <div className="card-icon">🎯</div>
-              <h3>Our Mission</h3>
-              <p>{companyInfo?.mission || 'To deliver exceptional value to our clients through innovative solutions and outstanding service.'}</p>
+          <div className="about-description-content">
+            <h2>About Us</h2>
+            <div className="company-tagline">
+              <p>Driven by high moral values and ethics, TechSolutions Inc. is a web development company which nurtures your website.</p>
             </div>
-            <div className="mv-card">
-              <div className="card-icon">👁️</div>
-              <h3>Our Vision</h3>
-              <p>{companyInfo?.vision || 'To be the leading provider of innovative solutions that transform businesses and improve lives.'}</p>
+            
+            <div className="company-motto">
+              <blockquote>THE BEST OF A DIGITAL DESIGN AND MARKETING COMPANY</blockquote>
+              <p>TechSolutions Inc. is an innovative, managed outsourcing and the Internet strategy company whose forte lies in being creative and an early technology adopter.</p>
+            </div>
+
+            <div className="company-info">
+              <div className="info-graphic">
+                <img 
+                  src={businessProcessImage}
+                  alt="TechSolutions Inc. Business Process" 
+                  className="process-image"
+                />
+              </div>
+              
+              <div className="info-text">
+                <p>TechSolutions Inc., founded in 2019, started as a small team of passionate developers with a vision to help businesses leverage technology for growth. The company journey started with an initial strength of just four persons, then has developed in leap and bounds during the past years and delivered many potential, viable and scalable solutions to many trusted clients across the globe. Our team works with total devotion, commitment and hard-work of all involved and today we stand proud with a wide-ranging team of skilled professionals.</p>
+                
+                <p>TechSolutions Inc. is a family of design, solutions, and Internet-based businesses, which makes it easy for everyone to buy or sell online from anywhere to any place in the world. Since its beginning, it has developed leading businesses in consumer e-commerce, online payment, business-to-business markets and cloud computing, reaching Internet users worldwide.</p>
+                
+                <p>TechSolutions Inc. is a certified company, which affirms our total commitment to quality along with reliability of applications. Our experienced IT professional team has designed, managed, built and maintained high quality applications for a wide range of business verticals including individual business requirements.</p>
+                
+                <p>Web design, web development, E-Commerce, mobile app development and other web services are under one roof that gives you the one-stop solution to enhance your business that leads to better direction.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -193,86 +177,6 @@ const About = () => {
           </div>
         </section>
       )}
-
-      {/* Leadership Team */}
-      {leadership.length > 0 && (
-        <section className="leadership" data-section="team">
-          <div className="container">
-            <div className={`section-header ${isVisible.team ? 'animate-fade-up' : ''}`}>
-              <h2>Leadership Team</h2>
-              <p>Meet the people leading our company forward</p>
-            </div>
-            <div className={`leadership-grid ${isVisible.team ? 'animate-slide-up' : ''}`}>
-              {leadership.map((member, index) => (
-                <div 
-                  key={member._id} 
-                  className="leader-card"
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  <div className="leader-image">
-                    {member.image ? (
-                      <img src={member.image} alt={member.name} />
-                    ) : (
-                      <div className="placeholder-avatar">
-                        {member.name.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="leader-info">
-                    <h3>{member.name}</h3>
-                    <p className="position">{member.position}</p>
-                    <p className="bio">{member.bio}</p>
-                    {member.socialMedia && (
-                      <div className="social-links">
-                        {member.socialMedia.linkedin && (
-                          <a href={member.socialMedia.linkedin} target="_blank" rel="noopener noreferrer">
-                            LinkedIn
-                          </a>
-                        )}
-                        {member.socialMedia.twitter && (
-                          <a href={member.socialMedia.twitter} target="_blank" rel="noopener noreferrer">
-                            Twitter
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Stats Section */}
-      <section className="stats-section" data-section="stats">
-        <div className="container">
-          <div className={`stats-grid ${isVisible.stats ? 'animate-slide-up' : ''}`}>
-            <div className="stat-item">
-              <div className="stat-number">
-                <span className="counter">100</span>+
-              </div>
-              <p>Projects Completed</p>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">
-                <span className="counter">50</span>+
-              </div>
-              <p>Happy Clients</p>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">
-                <span className="counter">5</span>+
-              </div>
-              <p>Years Experience</p>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">24/7</div>
-              <p>Support Available</p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

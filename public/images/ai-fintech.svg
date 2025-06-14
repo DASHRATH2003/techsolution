@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="200" fill="#000B1D"/>
+  <g transform="translate(50,25)">
+    <path d="M150 75L200 25L250 75L200 125L150 75Z" stroke="#00A3FF" stroke-width="2"/>
+    <path d="M100 75L150 25L200 75L150 125L100 75Z" stroke="#FF3366" stroke-width="2"/>
+    <path d="M200 75L250 25L300 75L250 125L200 75Z" stroke="#7C3AED" stroke-width="2"/>
+    <circle cx="150" cy="75" r="3" fill="#FF3366"/>
+    <circle cx="200" cy="75" r="3" fill="#00A3FF"/>
+    <circle cx="250" cy="75" r="3" fill="#7C3AED"/>
+    <line x1="150" y1="75" x2="250" y2="75" stroke="#4299E1" stroke-width="1"/>
+  </g>
+</svg> 

@@ -1,16 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { companyAPI, servicesAPI, testimonialsAPI } from '../services/api';
+import { companyAPI } from '../services/api';
+import TestimonialsSection from '../components/TestimonialsSection';
+import ServiceCard from '../components/ServiceCard';
+import WorkflowSection from '../components/WorkflowSection';
+import InsightsSection from '../components/InsightsSection';
+import AboutSection from '../components/AboutSection';
 import './Home.css';
+
+const servicesList = [
+  {
+    id: 1,
+    title: "Web Development",
+    icon: "🌐",
+    description: "Modern, responsive websites and web applications built with cutting-edge technologies.",
+    features: ["Custom Development", "Responsive Design", "Performance Optimization"],
+    technologies: ["React", "Node.js", "Next.js"],
+    bgColor: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+    link: "/services/web-development"
+  },
+  {
+    id: 2,
+    title: "Mobile App Development",
+    icon: "📱",
+    description: "Native and cross-platform mobile applications for iOS and Android platforms.",
+    features: ["Native Apps", "Cross-Platform", "App Store Support"],
+    technologies: ["React Native", "Flutter", "Swift"],
+    bgColor: "linear-gradient(135deg, #ec4899 0%, #d946ef 100%)",
+    link: "/services/mobile-development"
+  },
+  {
+    id: 3,
+    title: "UI/UX Design",
+    icon: "🎨",
+    description: "Beautiful and intuitive user interfaces with focus on user experience and accessibility.",
+    features: ["User Research", "Wireframing", "Prototyping"],
+    technologies: ["Figma", "Adobe XD", "Sketch"],
+    bgColor: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+    link: "/services/ui-ux-design"
+  },
+  {
+    id: 4,
+    title: "Digital Marketing",
+    icon: "📈",
+    description: "Comprehensive digital marketing solutions to grow your online presence.",
+    features: ["SEO", "Social Media", "Content Strategy"],
+    technologies: ["Google Analytics", "SEMrush", "HubSpot"],
+    bgColor: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+    link: "/services/digital-marketing"
+  },
+  {
+    id: 5,
+    title: "Cloud Solutions",
+    icon: "☁️",
+    description: "Scalable cloud infrastructure and deployment solutions for your applications.",
+    features: ["Cloud Migration", "DevOps", "Monitoring"],
+    technologies: ["AWS", "Azure", "Docker"],
+    bgColor: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+    link: "/services/cloud-solutions"
+  },
+  {
+    id: 6,
+    title: "E-commerce Solutions",
+    icon: "🛍️",
+    description: "Full-featured online stores with secure payment processing and inventory management.",
+    features: ["Payment Gateway", "Inventory", "Analytics"],
+    technologies: ["Shopify", "WooCommerce", "Stripe"],
+    bgColor: "linear-gradient(135deg, #84cc16 0%, #65a30d 100%)",
+    link: "/services/ecommerce"
+  }
+];
 
 const Home = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
-  const [services, setServices] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isVisible, setIsVisible] = useState({});
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
   const heroRef = useRef(null);
   const observerRef = useRef(null);
 
@@ -18,97 +83,69 @@ const Home = () => {
     fetchHomeData();
     setupIntersectionObserver();
     setupMouseTracking();
-    setupTestimonialRotation();
+
+    // Setup scroll progress
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentProgress = (window.scrollY / totalScroll) * 100;
+      setScrollProgress(currentProgress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  // Intersection Observer for scroll animations
   const setupIntersectionObserver = () => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setIsVisible(prev => ({
-              ...prev,
-              [entry.target.dataset.section]: true
-            }));
+            entry.target.classList.add('animate-in');
           }
         });
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.1,
+        rootMargin: '0px 0px -10% 0px'
+      }
     );
   };
 
-  // Mouse tracking for parallax effects
   const setupMouseTracking = () => {
     const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100
-      });
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth - 0.5) * 2;
+      const y = (clientY / window.innerHeight - 0.5) * 2;
+      
+      setMousePosition({ x, y });
+
+      // Parallax effect for hero elements
+      if (heroRef.current) {
+        const elements = heroRef.current.querySelectorAll('.parallax');
+        elements.forEach((el) => {
+          const speed = el.dataset.speed || 1;
+          const xOffset = x * 50 * speed;
+          const yOffset = y * 50 * speed;
+          el.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+        });
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   };
 
-  // Auto-rotate testimonials
-  const setupTestimonialRotation = () => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % 3);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  };
-
-  // Observe sections when they mount
-  useEffect(() => {
-    const sections = document.querySelectorAll('[data-section]');
-    sections.forEach(section => {
-      if (observerRef.current) {
-        observerRef.current.observe(section);
-      }
-    });
-  }, [loading]);
-
-  // Helper function to get service icons
-  const getServiceIcon = (title) => {
-    const iconMap = {
-      'Web Development': '🌐',
-      'Mobile App': '📱',
-      'E-commerce': '🛒',
-      'Digital Marketing': '📈',
-      'UI/UX Design': '🎨',
-      'Cloud Services': '☁️',
-      'Data Analytics': '📊',
-      'Consulting': '💡'
-    };
-
-    // Find matching icon or use default
-    const matchedKey = Object.keys(iconMap).find(key =>
-      title.toLowerCase().includes(key.toLowerCase())
-    );
-
-    return iconMap[matchedKey] || '⚡';
-  };
-
   const fetchHomeData = async () => {
     try {
       setLoading(true);
-      const [companyResponse, servicesResponse, testimonialsResponse] = await Promise.all([
-        companyAPI.getCompanyInfo(),
-        servicesAPI.getAllServices({ isActive: true }),
-        testimonialsAPI.getFeaturedTestimonials()
-      ]);
-
+      const companyResponse = await companyAPI.getCompanyInfo();
       setCompanyInfo(companyResponse.data);
-      setServices(servicesResponse.data.slice(0, 6)); // Show first 6 services
-      setTestimonials(testimonialsResponse.data.slice(0, 3)); // Show first 3 testimonials
     } catch (error) {
       console.error('Error fetching home data:', error);
     } finally {
@@ -117,12 +154,27 @@ const Home = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="loading-screen">
+        <div className="loading-animation">
+          <div className="loading-circle"></div>
+          <div className="loading-circle"></div>
+          <div className="loading-circle"></div>
+        </div>
+        <p>Loading amazing content...</p>
+      </div>
+    );
   }
 
   return (
     <div className="home">
-      {/* Animated Background Particles */}
+      {/* Scroll Progress Indicator */}
+      <div 
+        className="scroll-progress-bar" 
+        style={{ width: `${scrollProgress}%` }}
+      />
+
+      {/* Floating Particles */}
       <div className="particles-container">
         {[...Array(50)].map((_, i) => (
           <div
@@ -138,226 +190,140 @@ const Home = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="hero" ref={heroRef}>
+      <section className="hero" ref={heroRef} data-section="hero">
         <div className="hero-background">
-          <div
-            className="hero-gradient"
+          <div 
+            className="hero-gradient parallax" 
+            data-speed="0.5"
             style={{
-              transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`
+              transform: `translate(${mousePosition.x * 20}px, ${mousePosition.y * 20}px)`
             }}
           />
-          <div className="floating-shapes">
-            <div className="shape shape-1" />
-            <div className="shape shape-2" />
-            <div className="shape shape-3" />
-          </div>
         </div>
 
-        <div className="hero-content">
-          <div className="hero-text animate-slide-up">
-            <div className="hero-badge">
-              <span>🚀 Innovation Meets Excellence</span>
-            </div>
-            <h1 className="hero-title">
-              <span className="title-line">Transform Your</span>
-              <span className="title-line gradient-text">Digital Dreams</span>
-              <span className="title-line">Into Reality</span>
+        <div className="container">
+          <div className="hero-content">
+            <h1 className="animate-title">
+              Welcome to <span className="highlight">Codetech</span>
+              {(companyInfo?.tagline || 'Building the Future').split('').map((char, i) => (
+                <span 
+                  key={i} 
+                  className="char"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {char}
+                </span>
+              ))}
             </h1>
-            <p className="hero-description">
-              {companyInfo?.mission || 'We craft cutting-edge solutions that propel your business into the future. From concept to deployment, we\'re your trusted technology partner.'}
+            <p className="hero-subtitle parallax" data-speed="0.8">
+              {companyInfo?.description || 'Innovative solutions for modern challenges'}
             </p>
-            <div className="hero-buttons">
-              <Link to="/contact" className="btn btn-primary btn-glow">
-                <span>Start Your Journey</span>
-                <div className="btn-shine" />
-              </Link>
-              <Link to="/services" className="btn btn-secondary btn-glass">
-                <span>Explore Services</span>
-                <svg className="btn-arrow" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+            <div className="hero-cta parallax" data-speed="1.2">
+              <Link to="/services" className="btn btn-primary btn-glow">
+                Explore Our Services
+                <span className="btn-particles">
+                  {[...Array(6)].map((_, i) => (
+                    <span key={i} className="particle-dot" />
+                  ))}
+                </span>
               </Link>
             </div>
-            <div className="hero-stats">
-              <div className="stat-item">
-                <div className="stat-number">100+</div>
-                <div className="stat-label">Projects Delivered</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-number">50+</div>
-                <div className="stat-label">Happy Clients</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-number">99%</div>
-                <div className="stat-label">Success Rate</div>
-              </div>
-            </div>
           </div>
 
-          <div className="hero-visual">
-            <div className="hero-card floating">
-              <div className="card-glow" />
-              <div className="tech-stack">
-                <div className="tech-item">React</div>
-                <div className="tech-item">Node.js</div>
-                <div className="tech-item">MongoDB</div>
-                <div className="tech-item">AWS</div>
-              </div>
-              <div className="code-preview">
-                <div className="code-line">
-                  <span className="code-keyword">const</span>
-                  <span className="code-variable"> success</span>
-                  <span className="code-operator"> = </span>
-                  <span className="code-function">buildAmazing</span>
-                  <span className="code-bracket">(</span>
-                  <span className="code-string">'your-idea'</span>
-                  <span className="code-bracket">);</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="scroll-indicator">
-          <div className="scroll-arrow">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <p>Scroll to explore</p>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section
-        className={`services-preview ${isVisible.services ? 'animate-in' : ''}`}
-        data-section="services"
-      >
-        <div className="container">
-          <div className="section-header">
-            <div className="section-badge">
-              <span>💼 What We Do</span>
-            </div>
-            <h2 className="section-title">
-              Our <span className="gradient-text">Premium</span> Services
-            </h2>
-            <p className="section-description">
-              Cutting-edge solutions tailored to accelerate your business growth
-            </p>
-          </div>
-
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <div
-                key={service._id}
-                className="service-card modern-card"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="card-background" />
-                <div className="service-icon">
-                  <div className="icon-glow" />
-                  {getServiceIcon(service.title)}
-                </div>
-                <div className="service-content">
-                  <h3>{service.title}</h3>
-                  <p>{service.shortDescription}</p>
-                  <div className="service-features">
-                    <span className="feature-tag">Modern</span>
-                    <span className="feature-tag">Scalable</span>
-                    <span className="feature-tag">Secure</span>
-                  </div>
-                </div>
-                <Link to={`/services/${service._id}`} className="service-link modern-link">
-                  <span>Explore Service</span>
-                  <svg className="link-arrow" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-                <div className="card-hover-effect" />
-              </div>
-            ))}
-          </div>
-
-          <div className="section-footer">
-            <Link to="/services" className="btn btn-outline btn-large">
-              <span>View All Services</span>
-              <div className="btn-particles">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="particle-dot" />
-                ))}
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* About Preview */}
-      <section className="about-preview">
-        <div className="container">
-          <div className="about-content">
-            <div className="about-text">
-              <h2>About Our Company</h2>
-              <p>{companyInfo?.story || 'We are a dedicated team committed to delivering excellence.'}</p>
-              <Link to="/about" className="btn btn-primary">Learn More About Us</Link>
-            </div>
-            <div className="about-stats">
-              <div className="stat">
-                <h3>100+</h3>
-                <p>Projects Completed</p>
-              </div>
-              <div className="stat">
-                <h3>50+</h3>
-                <p>Happy Clients</p>
-              </div>
-              <div className="stat">
-                <h3>5+</h3>
-                <p>Years Experience</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      {testimonials.length > 0 && (
-        <section className="testimonials-preview">
-          <div className="container">
-            <div className="section-header">
-              <h2>What Our Clients Say</h2>
-              <p>Don't just take our word for it</p>
-            </div>
-            <div className="testimonials-grid">
-              {testimonials.map((testimonial) => (
-                <div key={testimonial._id} className="testimonial-card">
-                  <div className="testimonial-content">
-                    <p>"{testimonial.testimonial}"</p>
-                  </div>
-                  <div className="testimonial-author">
-                    <div className="author-info">
-                      <h4>{testimonial.clientName}</h4>
-                      <p>{testimonial.clientPosition} at {testimonial.companyName}</p>
-                    </div>
-                    <div className="rating">
-                      {'★'.repeat(testimonial.rating)}
+          <div className="hero-visual parallax" data-speed="1.5">
+            <div className="floating-cards">
+              {[...Array(3)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className="tech-card"
+                  style={{
+                    transform: `rotate(${i * 15}deg) translate(${mousePosition.x * (i + 1) * 10}px, ${mousePosition.y * (i + 1) * 10}px)`
+                  }}
+                >
+                  <div className="card-glow" />
+                  <div className="card-content">
+                    <div className="tech-icon">{['🚀', '💡', '⚡'][i]}</div>
+                    <div className="tech-text">
+                      {['Innovation', 'Creativity', 'Speed'][i]}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="section-footer">
-              <Link to="/testimonials" className="btn btn-outline">View All Testimonials</Link>
-            </div>
           </div>
-        </section>
-      )}
+        </div>
+
+        <div className="scroll-indicator">
+          <div className="mouse">
+            <div className="wheel"></div>
+          </div>
+          <div className="arrows">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <AboutSection />
+
+      {/* Services Section */}
+      <section className="services-section" data-section="services">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2 className="section-title">
+              Our <span className="gradient-text">Services</span>
+            </h2>
+            <p className="section-description">
+              We offer a comprehensive suite of digital solutions to help your business thrive in the modern world.
+            </p>
+          </div>
+
+          <div className="services-grid">
+            {servicesList.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                index={index}
+                mousePosition={mousePosition}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Workflow Section */}
+      <WorkflowSection />
+
+      {/* Insights Section */}
+      <InsightsSection />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
 
       {/* CTA Section */}
-      <section className="cta-section">
+      <section className="cta-section" data-section="cta">
         <div className="container">
           <div className="cta-content">
-            <h2>Ready to Get Started?</h2>
-            <p>Let's discuss how we can help your business grow</p>
-            <Link to="/contact" className="btn btn-primary btn-large">Contact Us Today</Link>
+            <h2 className="animate-in">Ready to Transform Your Business?</h2>
+            <p className="animate-in">Let's create something amazing together</p>
+            <Link to="/contact" className="btn btn-primary btn-large animate-in">
+              Get Started
+              <span className="btn-effect"></span>
+            </Link>
+          </div>
+          <div className="cta-shapes">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="floating-shape"
+                style={{
+                  animationDelay: `${i * 0.5}s`,
+                  transform: `translate(${mousePosition.x * (i + 1) * 2}px, ${mousePosition.y * (i + 1) * 2}px)`
+                }}
+              />
+            ))}
           </div>
         </div>
       </section>
